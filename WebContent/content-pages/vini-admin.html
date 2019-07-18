@@ -1,0 +1,224 @@
+<article class="content dashboard-page">
+    <section class="section" ng-controller="viniController">
+    		<div class="row sameheight-container" ng-if="visualizzaEsito">
+    			<div class="col-md-12">
+                <div class="card sameheight-item stats" data-exclude="xs">
+                    <div class="card-block">
+                        <div class="title-block">
+                            <h4 class="title"> Esito Operazione</h4>
+                        </div>
+                         <div class="row" style="background-color: {{coloreSfondoEsito}}">
+                         	<span>{{messaggioEsito}}</span>
+                         </div>
+                    </div>
+                </div>
+            </div>
+    		</div>
+        <div class="row sameheight-container">
+            <div class="col-md-5" ng-click="clickVuoto()">
+                <div class="card sameheight-item stats" data-exclude="xs">
+                    <div class="card-block">
+                        <div class="title-block">
+                            <h4 class="title"> Lista Vini</h4>
+                        </div>
+                        <div class="title-block">
+                            <button ng-click="azzeraVinoSelezionato()">NUOVO VINO</button>
+                        </div>		
+                        <div>SEARCH <input type= text ng-model="searchBox">	</div>		
+                        <div uib-pagination class="pagination" total-items="filterLista.length" ng-model="page"
+										ng-change="pageChanged()" previous-text="&lsaquo;" next-text="&rsaquo;" items-per-page=20></div>		
+                        <div class="row">
+<!--                             qui ci va la lista degli utenti -->
+							<div class="table-responsive">
+	                            <table class="table table-striped table-bordered table-hover">
+<!-- 	                            rendere dinamica la lista -->
+	                                <thead>
+	                                    <tr>
+	                                        <th>Nome</th>
+	                                        <th>Azienda</th>
+	                                        <th>Anno</th>
+	                                        <th></th>
+	                                    </tr>
+	                                </thead>
+	                                <tbody>
+	                              
+	                                    <tr ng-repeat="vino in filterLista =( listaVini | filter:searchBox | orderBy:'nomeVino' ) | limitTo:20:20*(page-1)" ng-click="clickVino(vino);$event.stopPropagation()">
+	                                        <td ng-if="vinoSelezionato.idVino!=vino.idVino" >{{vino.nomeVino}}</td>
+	                                        <td ng-if="vinoSelezionato.idVino!=vino.idVino" >{{vino.aziendaVinoInt.nomeAzienda}}</td>
+	                                        <td ng-if="vinoSelezionato.idVino!=vino.idVino" >{{vino.annoVino}}</td>
+	                                        <td ng-if="vinoSelezionato.idVino!=vino.idVino"><button ng-click="confirmDecision(vino)">X</button></td>
+	                                        
+	                                        <td ng-if="vinoSelezionato.idVino==vino.idVino" style="border-width: 5px;border-style: solid;border-color: green;">{{vino.nomeVino}}</td>
+	                                        <td ng-if="vinoSelezionato.idVino==vino.idVino" style="border-width: 5px;border-style: solid;border-color: green;">{{vino.aziendaVinoInt.nomeAzienda}}</td>
+	                                        <td ng-if="vinoSelezionato.idVino==vino.idVino" style="border-width: 5px;border-style: solid;border-color: green;">{{vino.annoVino}}</td>
+	                                        <td ng-if="vinoSelezionato.idVino==vino.idVino" style="border-width: 5px;border-style: solid;border-color: green;"><button ng-click="confirmDecision(vino)">X</button></td>
+	                                    </tr>
+	                                </tbody>
+	                            </table>
+	                        </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-7">
+                <div class="card sameheight-item" data-exclude="xs" id="dashboard-history">
+                    <div class="card-header card-header-sm bordered">
+                        <div class="header-block">
+                            <h3 class="title">Aggiungi/modifica un vino</h3>
+                        </div>
+                    </div>
+                    <div class="card-block">
+                        <div class="tab-content">
+<!--                             qui ci va il form per creare/modificare un utente -->
+<!-- 								<form name="salvaUtenteForm" ng-submit="submitTest()" novalidate> -->
+								<form name="salvaVinoForm" ng-submit="salvaVinoForm.$valid && submit()" novalidate>
+									<table>
+										<tr>
+											<td>
+												<span>id Vino</span>
+											</td>
+											<td>
+												<input type="text" ng-model="vinoSelezionato.idVino" disabled/>
+											</td>
+										</tr>
+										<tr>
+											<td>
+												<span>Nome Vino</span>
+											</td>
+											<td>
+												<input type="text" ng-model="vinoSelezionato.nomeVino"/>
+											</td>
+										</tr>
+										<tr>
+											<td>
+												<span>Acquistabile</span>
+											</td>
+											<td>
+												<input type="checkbox" ng-model="acquistabileVino"/>
+											</td>
+										</tr>
+										<tr>
+											<td>
+												<span>Azienda</span>
+											</td>
+											<td>
+												<!-- caricare le aziende selezionabili con menu' a tendina  -->
+												<ui-select ng-model="aziendaSelezionata.selected" theme="selectize" style="width: 300px;" title="Scelta azienda">
+												    <ui-select-match placeholder="Scegli o cerca un'azienda nella lista...">{{$select.selected.nomeAzienda}}</ui-select-match>
+												    <ui-select-choices repeat="azienda in aziende | filter: $select.search">
+												      <span ng-bind-html="azienda.nomeAzienda | highlight: $select.search"></span>
+												      <small ng-bind-html="azienda.idAzienda | highlight: $select.search"></small>
+												    </ui-select-choices>
+												 </ui-select>
+												 <input type="text" ng-model="aziendaSelezionata.selected.nomeAzienda" disabled="disabled"/>
+											</td>
+										</tr>
+										<tr>
+											<td>
+												<span>Anno</span>
+											</td>
+											<td>
+												<input type="number" ng-model="vinoSelezionato.annoVino"/>
+											</td>
+										</tr>
+										<tr>
+											<td>
+												<span>Uvaggio</span>
+											</td>
+											<td>
+												<input type="text" ng-model="vinoSelezionato.uvaggioVino"/>
+											</td>
+										</tr>
+										<tr>
+											<td>
+												<span>Regione</span>
+											</td>
+											<td>
+												<input type="text" ng-model="vinoSelezionato.regioneVino"/>
+											</td>
+										</tr>
+										<tr>
+											<td>
+												<span>Descrizione Breve</span>
+											</td>
+											<td>
+												<input type="checkbox" ng-model="editor"/>
+												<textarea ng-if="editor" ui-tinymce="tinymceOptions" ng-model="vinoSelezionato.inBreveVino"></textarea>	
+												<textarea ng-if="!editor" cols="50" ng-model="vinoSelezionato.inBreveVino"/></textarea> 
+											</td>
+										</tr>
+										<!-- <tr>
+											<td>
+												<span>Profumo Vino</span>
+											</td>
+											<td>
+												<input type="checkbox" ng-model="editor1"/>
+												<textarea ng-if="editor1" ui-tinymce="tinymceOptions" ng-model="vinoSelezionato.profumoVino"></textarea>	
+												<textarea ng-if="!editor1" cols="50" ng-model="vinoSelezionato.profumoVino"/></textarea>
+											</td>
+										</tr> -->
+										<tr>
+											<td>
+												<span>Descrizione Vino</span>
+											</td>
+											<td>
+												<input type="checkbox" ng-model="editor2"/>
+												<textarea ng-if="editor2" ui-tinymce="tinymceOptions" ng-model="vinoSelezionato.infoVino"></textarea>	
+												<textarea ng-if="!editor2" cols="50" ng-model="vinoSelezionato.infoVino"/></textarea> 
+											</td>
+										</tr>
+										<tr>
+											<td>
+												<span>urlImmagineVino</span>
+											</td>
+											<td>
+												<input type="text" ng-model="vinoSelezionato.urlImmagineVino"/>
+											</td>
+										</tr>
+										<tr>
+											<td>
+												<span>Upload Immagine Vino</span>
+											</td>
+											<td>
+												<input type="file" class="button" ngf-select ng-model="urlImmagineVino" name="fileVino" ngf-pattern="'image/*'"
+												    ngf-accept="'image/*'" ngf-max-size="1MB" ngf-min-height="100"/>
+<!-- 												    ngf-resize="{width: 200, height: 200}"/> -->
+												<input type="button" value="carica" ng-click="submitImageVino(urlImmagineVino)">
+												<img ng-src="{{vinoSelezionato.urlImmagineVino}}" width="150px" ng-show="vinoSelezionato.urlImmagineVino">	
+											</td>
+										</tr>
+										<!-- <tr>
+											<td>
+												<span>urlLogoVino</span>
+											</td>
+											<td>
+												<input type="text" ng-model="vinoSelezionato.urlLogoVino"/>
+											</td>
+										</tr>
+										<tr>
+											<td>
+												<span>Upload Logo Vino</span>
+											</td>
+											<td>
+												<input type="file" class="button" ngf-select ng-model="fileLogoVino" name="fileLogoVino" ngf-pattern="'image/*'"
+												    ngf-accept="'image/*'" ngf-max-size="1MB" ngf-min-height="100"/>
+												    ngf-resize="{width: 200, height: 200}"/>
+												<input type="button" value="carica" ng-click="submitImageLogoVino(fileLogoVino)">
+												<img ng-src="{{vinoSelezionato.urlLogoVino}}" width="150px" ng-show="vinoSelezionato.urlLogoVino">			
+											</td>
+										</tr> -->
+										<tr>
+											<td style="padding-top:1em" colspan=2>
+												<input style="float:right" type="button" value="DUPLICA VINO" ng-click="duplicaVino()"/>
+												<input style="float:left" type="button" value="SALVA VINO" ng-click="salvaVino()">
+											</td>
+										</tr>
+									</table>
+								</form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</article>

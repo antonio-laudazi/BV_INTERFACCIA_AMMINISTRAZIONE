@@ -1,0 +1,138 @@
+<article class="content dashboard-page">
+    <section class="section" ng-controller="badgeController">
+    		<div class="row sameheight-container" ng-if="visualizzaEsito">
+    			<div class="col-md-12">
+                <div class="card sameheight-item stats" data-exclude="xs">
+                    <div class="card-block">
+                        <div class="title-block">
+                            <h4 class="title"> Esito Operazione</h4>
+                        </div>
+                         <div class="row" style="background-color: {{coloreSfondoEsito}}">
+                         	<span>{{messaggioEsito}}</span>
+                         </div>
+                    </div>
+                </div>
+            </div>
+    		</div>
+        <div class="row sameheight-container">
+            <div class="col-md-5" ng-click="clickVuoto()">
+                <div class="card sameheight-item stats" data-exclude="xs">
+                    <div class="card-block">
+                        <div class="title-block">
+                        	<h4 class="title"> Solo modifica badge, no inserimento nell'evento</h4>
+                            <h4 class="title"> Lista Badge</h4>
+                        </div>	
+                        <div> SEARCH <input type= text ng-model="searchBox">	</div>	
+                        <div uib-pagination class="pagination" total-items="filterLista.length" ng-model="page"
+										ng-change="pageChanged()" previous-text="&lsaquo;" next-text="&rsaquo;" items-per-page=20></div>			
+                        <div class="row">
+<!--                             qui ci va la lista degli eventi -->
+							<div class="table-responsive">
+	                            <table class="table table-striped table-bordered table-hover">
+<!-- 	                            rendere dinamica la lista -->
+	                                <thead>
+	                                    <tr>
+
+	                                        <th>Nome Badge</th>
+	                                        <th>data</th>
+
+	                                        <th></th>
+	                                    </tr>
+	                                </thead>
+	                               <tbody>
+
+	                                    <tr ng-repeat="badge in filterLista =(listaBadges | filter:searchBox | orderBy:'dataBadge') | limitTo:20:20*(page-1)" ng-click="clickBadge(badge);$event.stopPropagation()">
+	                                        <td ng-if="badgeSelezionato.idBadge!=badge.idBadge">{{badge.nomeBadge}}</td>
+	                                        <td ng-if="badgeSelezionato.idBadge!=badge.idBadge">{{badge.normalDate}}</td>
+	                                        <!-- <td ng-if="badgeSelezionato.idBadge!=badge.idBadge"><button ng-click="confirmDecision(badge)">X</button></td>-->
+	                                        
+	                                        <td ng-if="badgeSelezionato.idBadge==badge.idBadge" style="border-width: 5px;border-style: solid;border-color: green;">{{badge.nomeBadge}}</td>
+	                                        <td ng-if="badgeSelezionato.idBadge==badge.idBadge" style="border-width: 5px;border-style: solid;border-color: green;">{{badge.normalDate}}</td>
+	                                        <!-- <td ng-if="badgeSelezionato.idBadge==badge.idBadge" style="border-width: 5px;border-style: solid;border-color: green;"><button ng-click="confirmDecision(badge)">X</button></td>-->
+	                                    </tr>
+	                                </tbody>
+	                            </table>
+	                        </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+  		            <div class="col-md-7">
+                <div class="card sameheight-item" data-exclude="xs" id="dashboard-history">
+                    <div class="card-header card-header-sm bordered">
+                        <div class="header-block">
+                            <h3 class="title">Badge selezionato</h3>
+                        </div>
+                    </div>
+                    <div class="card-block">
+                        <div class="tab-content">
+<!--                             qui ci va il form per creare/modificare il feed -->
+								<form name="salvaBadgeForm" ng-submit="salvaBadgeForm.$valid && submit()" novalidate>
+								<table  cellpadding="10">
+									<tr>
+										<td>
+											<span>id</span>
+										</td>
+										<td>
+											<input type="text" ng-model="badgeSelezionato.idBadge" disabled/>
+										</td>
+									</tr>
+									<tr>
+										<td>
+											<span>Nome Badge</span>
+										</td>
+										<td>
+											<input type="text" ng-model="badgeSelezionato.nomeBadge" />
+										</td>
+									</tr>
+									<tr>
+										<td>
+											<span>info Badge</span>
+										</td>
+										<td>
+											<input type="text" ng-model="badgeSelezionato.infoBadge" />
+										</td>
+									</tr>																									
+									<tr>
+										<td>
+											<span>url Immagine</span>
+										</td>
+										<td>
+											<input type="text" ng-model="badgeSelezionato.urlLogoBadge"/>
+										</td>
+									</tr>
+									<tr>
+										<td>
+											<span>Upload Image</span>
+										</td>
+										<td>
+											<input type="file" class="button" ngf-select ng-model="file" name="file" ngf-pattern="'image/*'"
+											    ngf-accept="'image/*'" />
+											<input type="button" value="carica" ng-click="submitImage(file)">
+											<img ng-src="{{badgeSelezionato.urlLogoBadge}}" width="150px" ng-show="badgeSelezionato.urlLogoBadge">
+										</td>
+									</tr>
+									<tr>
+										<td>
+											<span>ID Evento</span>
+										</td>
+										<td>
+											<input type="text" ng-model="badgeSelezionato.eventoBadge.idEvento" disabled/>
+										</td>
+									</tr>	
+										<tr>
+											<td style="padding-top:1em" colspan="2" >
+												<input type="submit" style="float:left" id="submit" value="Salva" ng-click="salva()"/>
+											</td>
+										</tr>
+								</table>
+								<button ng-click="goToEventi()">vai all'evento</button>
+							</form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    </section>
+</article>

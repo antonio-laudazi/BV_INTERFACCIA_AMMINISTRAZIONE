@@ -1,0 +1,201 @@
+<article class="content dashboard-page"  >
+    <section class="section" ng-controller="utentiController" >
+    		<div class="row sameheight-container" ng-if="visualizzaEsito">
+    			<div class="col-md-12">
+                <div class="card sameheight-item stats" data-exclude="xs">
+                    <div class="card-block">
+                        <div class="title-block">
+                            <h4 class="title"> Esito Operazione</h4>
+                        </div>
+                         <div class="row" style="background-color: {{coloreSfondoEsito}}">
+                         	<span>{{messaggioEsito}}</span>
+                         </div>
+                    </div>
+                </div>
+            </div>
+    		</div>
+        <div class="row sameheight-container" >
+            <div class="col-md-6" ng-click="clickVuoto()">
+                <div class="card sameheight-item stats" data-exclude="xs">
+                    <div class="card-block">
+                        <div class="title-block">
+                            <h4 class="title"> Lista Utenti</h4>
+                        </div>
+                        <div class="title-block">
+                            <button ng-click="azzeraForm()">NUOVO UTENTE</button>
+                        </div>			
+                        <div> SEARCH <input type= text ng-model="searchBox">	</div>	
+                        <div uib-pagination class="pagination" total-items="filterLista.length" ng-model="page"
+										ng-change="pageChanged()" previous-text="&lsaquo;" next-text="&rsaquo;" items-per-page=20></div>
+                        <div class="row">
+<!--                             qui ci va la lista degli utenti -->
+							<div class="table-responsive">
+	                            <table class="table table-striped table-bordered table-hover">
+<!-- 	                            rendere dinamica la lista -->
+	                                <thead>
+	                                    <tr>
+	                                        <th>Nome</th>
+	                                        <th>Email</th>
+	                                    </tr>
+	                                </thead>
+	                                <tbody>
+	                                    <tr  ng-repeat="utente in filterLista = (listaUtenti | filter:searchBox | orderBy:'usernameUtente' ) | limitTo:20:20*(page-1)" ng-click="clickUtente(utente);$event.stopPropagation()">
+	                                        <td ng-if="utenteSelezionato.idUtente!=utente.idUtente" >{{utente.usernameUtente}}</td>
+											<td ng-if="utenteSelezionato.idUtente!=utente.idUtente" >{{utente.emailUtente}}</td>
+	                                        <td ng-if="utenteSelezionato.idUtente!=utente.idUtente" ><button ng-click="confirmDecision(utente)">X</button></td>
+	                                        
+	                                        <td ng-if="utenteSelezionato.idUtente==utente.idUtente" style="border-width: 5px;border-style: solid;border-color: green;">{{utente.usernameUtente}}</td>
+											<td ng-if="utenteSelezionato.idUtente==utente.idUtente" style="border-width: 5px;border-style: solid;border-color: green;">{{utente.emailUtente}}</td>
+	                                        <td ng-if="utenteSelezionato.idUtente==utente.idUtente" style="border-width: 5px;border-style: solid;border-color: green;"><button ng-click="confirmDecision(utente)">X</button></td>
+	                                    </tr>
+	                                </tbody>
+    
+	                            </table>
+	                            
+	                        </div>
+	                        
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card sameheight-item" data-exclude="xs" id="dashboard-history">
+                    <div class="card-header card-header-sm bordered">
+                        <div class="header-block">
+                            <h3 class="title">Aggiungi/modifica un utente</h3>
+                        </div>
+                    </div>
+                    <div class="card-block">
+                        <div class="tab-content">
+<!--                             qui ci va il form per creare/modificare un utente -->
+<!-- 								<form name="salvaUtenteForm" ng-submit="submitTest()" novalidate> -->
+								<form name="salvaUtenteForm" ng-submit="salvaUtenteForm.$valid && submit()" novalidate>
+									<table >
+										<tr>
+											<td>
+												<span>id</span>
+											</td>
+											<td>
+												<input type="text" ng-model="idUtente" disabled/>
+											</td>
+										</tr>
+										<tr>
+											<td>
+												<span>Name</span>
+											</td>
+											<td>
+												<input name="usernameUtente" type="text" ng-model="usernameUtente" />
+											</td>
+										</tr>
+										<tr>
+											<td>
+												<span>nome</span>
+											</td>
+											<td>
+												<input name="nomeUtenteInput" type="text" ng-model="nomeUtente" />
+											</td>
+										</tr>
+										<tr>
+											<td>
+												<span>cognome</span>
+											</td>
+											<td>
+												<input name="cognomeUtenteInput" type="text" ng-model="cognomeUtente" />
+											</td>
+										</tr>
+										<tr>
+											<td>
+												<span>email</span>
+											</td>
+											<td>
+												<input name="emailUtenteInput" type="text" ng-model="emailUtente" />
+											</td>
+										</tr>
+										<tr>
+											<td>
+												<span>crediti</span>
+											</td>
+											<td>
+												<input type="text" ng-model="creditiUtente"/>
+											</td>
+										</tr>
+										<tr>
+											<td>
+												<span>esperienza</span>
+											</td>
+											<td>
+												<input type="text" ng-model="esperienzaUtente"/>
+											</td>
+										</tr>
+										<tr>
+											<td>
+												<span>livello</span>
+											</td>
+											<td>
+												<input name="livelloUtenteInput" type="text" ng-model="livelloUtente"/>
+											</td>
+										</tr>
+										<tr>
+											<td>
+												<span>biografia</span>
+											</td>
+											<td>
+												<input type="checkbox" ng-model="editor"/> HTML
+												<textarea ng-if="editor" ui-tinymce="tinymceOptions" ng-model="biografiaUtente"></textarea>
+												<textarea ng-if="!editor"  cols="50" ng-model="biografiaUtente" rows="3"></textarea>
+											</td>
+										</tr>
+										<tr>
+											<td>
+												<span>url foto</span>
+											</td>
+											<td>
+												<input type="text" ng-model="urlFotoUtente"/>
+											</td>
+										</tr>
+										<tr>
+											<td>
+												<span>Immagine profilo</span>
+											</td>
+											<td style="padding-top:1em" colspan="2">
+												<input type="file" class="button" ngf-select ng-model="file" name="file" ngf-pattern="'image/*'"
+											    	ngf-accept="'image/*'" ngf-max-size="1MB" ngf-min-height="100"/>
+<!-- 												    ngf-resize="{width: 200, height: 200}"/> -->
+												<input type="button" value="carica" ng-click="submitTest(file)">
+<!-- 												<img ng-src="{{urlFotoUtente}}" width="150px" ng-show="urlFotoUtente">
+ -->											</td>
+										</tr>		
+										<tr>
+											<td style="padding-top:1em" colspan="2">
+												<input type="submit" style="float:left" id="submit" value="Salva"/>
+												<input type="button" style="float:right" value="duplica utente" ng-click="duplicaUtente()"/>
+												
+											</td>
+										</tr>
+									</table>
+									
+								</form>
+								<br></br>
+								lista eventi acquistati
+								<table class="table table-striped table-bordered table-hover">
+	                                <thead>
+	                                    <tr>
+	                                        <th>idEvento</th>
+	                                        <th></th>
+	                                    </tr>
+	                                </thead>
+	                                <tbody>
+	                                    <tr ng-repeat="evento in acquistatiEventiUtenteInt" >
+	
+	                                        <td>{{evento.idEvento}}</td>
+	                                        <td><button ng-click="deleteAcquisto(evento)">X</button></td>
+	                                    </tr>	
+	                                </tbody>
+	                            </table>	
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</article>

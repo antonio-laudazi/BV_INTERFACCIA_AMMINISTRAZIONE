@@ -1,0 +1,377 @@
+<article class="content dashboard-page">
+    <section class="section" ng-controller="aziendeController">
+    		<div class="row sameheight-container" ng-if="visualizzaEsito">
+    			<div class="col-md-12">
+                <div class="card sameheight-item stats" data-exclude="xs">
+                    <div class="card-block">
+                        <div class="title-block">
+                            <h4 class="title"> Esito Operazione</h4>
+                        </div>
+                         <div class="row" style="background-color: {{coloreSfondoEsito}}">
+                         	<span>{{messaggioEsito}}</span>
+                         </div>
+                    </div>
+                </div>
+            </div>
+    		</div>
+        <div class="row sameheight-container" >
+            <div class="col-md-5" ng-click="clickVuoto()">
+                <div class="card sameheight-item stats" data-exclude="xs">
+                    <div class="card-block">
+                        <div class="title-block">
+                            <h4 class="title"> Lista Aziende</h4>
+                        </div>
+                        <div class="title-block">
+                            <button ng-click="azzeraForm()">NUOVA AZIENDA</button>
+                        </div>		
+                        <div> SEARCH <input type= text ng-model="searchBox">	</div>	
+                        <div uib-pagination class="pagination" total-items="filterLista.length" ng-model="page"
+										ng-change="pageChanged()" previous-text="&lsaquo;" next-text="&rsaquo;" items-per-page=20></div>			
+                        <div class="row">
+<!--                             qui ci va la lista degli utenti -->
+							<div class="table-responsive">
+	                            <table class="table table-striped table-bordered table-hover">
+<!-- 	                            rendere dinamica la lista -->
+	                                <thead>
+	                                    <tr>
+	                                        <th>Nome</th>
+	                                        <th>Citt&agrave Azienda</th>
+	                                        <th></th>
+	                                    </tr>
+	                                </thead>
+	                                <tbody>
+	                       
+	                                    <tr ng-repeat="azienda in filterLista = (listaAziende | filter:searchBox | orderBy:'nomeAzienda') | limitTo:20:20*(page-1)" ng-click="clickAzienda(azienda);$event.stopPropagation()">
+	                                        <td ng-if="(azienda.active || showDis)&& aziendaSelezionata.idAzienda==azienda.idAzienda" style="border-width: 5px;border-style: solid;border-color: green;">{{azienda.nomeAzienda}}</td>
+	                                        <td ng-if="(azienda.active || showDis)&& aziendaSelezionata.idAzienda==azienda.idAzienda" style="border-width: 5px;border-style: solid;border-color: green;">{{azienda.cittaAzienda}}</td>
+	                                        <td ng-if="azienda.active &&  aziendaSelezionata.idAzienda==azienda.idAzienda"style="border-width: 5px;border-style: solid;border-color: green;"><button ng-click="disableAzienda(azienda)">Disable</button>
+	                                        <td ng-if="(!azienda.active && showDis) && aziendaSelezionata.idAzienda==azienda.idAzienda"style="border-width: 5px;border-style: solid;border-color: green;"><button ng-click="disableAzienda(azienda)">Enable</button>
+	                                        <td ng-if="(azienda.active || showDis)&& aziendaSelezionata.idAzienda==azienda.idAzienda"style="border-width: 5px;border-style: solid;border-color: green;"><button ng-click="confirmDecision(azienda)">X</button></td>
+	                                   
+	                                    	<td ng-if="(azienda.active || showDis)&& aziendaSelezionata.idAzienda!=azienda.idAzienda">{{azienda.nomeAzienda}}</td>
+	                                        <td ng-if="(azienda.active || showDis)&& aziendaSelezionata.idAzienda!=azienda.idAzienda">{{azienda.cittaAzienda}}</td>
+	                                        <td ng-if="(azienda.active)&& aziendaSelezionata.idAzienda!=azienda.idAzienda"><button ng-click="disableAzienda(azienda)">Disable</button>
+	                                        <td ng-if="(!azienda.active && showDis)&& aziendaSelezionata.idAzienda!=azienda.idAzienda"><button ng-click="disableAzienda(azienda)">Enable</button>
+	                                        <td ng-if="(azienda.active || showDis)&& aziendaSelezionata.idAzienda!=azienda.idAzienda"><button ng-click="confirmDecision(azienda)">X</button></td>
+	                                    </tr>
+	                                </tbody>
+	                            </table>
+	                        </div>
+                        </div>
+                    </div>
+                </div>
+                 <button ng-if="!showDis" ng-click="showDisable()">visualizza aziende disabilitate</button>
+                 <button ng-if="showDis" ng-click="showDisable()">nascondi aziende disabilitate</button>
+            </div>
+  
+            <div class="col-md-7">
+                <div class="card sameheight-item" data-exclude="xs" id="dashboard-history">
+                    <div class="card-header card-header-sm bordered">
+                        <div class="header-block">
+                            <h3 class="title">Aggiungi/modifica un'azienda</h3>
+                        </div>
+                    </div>
+                    <div class="card-block">
+                        <div class="tab-content">
+<!--                             qui ci va il form per creare/modificare un utente -->
+<!-- 								<form name="salvaUtenteForm" ng-submit="submitTest()" novalidate> -->
+								<form name="salvaAziendaForm" ng-submit="salvaAziendaForm.$valid && submit()" novalidate>
+									<table  cellpadding="10">
+										<tr>
+											<td>
+												<span>id</span>
+											</td>
+											<td>
+												<input type="text" ng-model="aziendaSelezionata.idAzienda" disabled/>
+											</td>
+										</tr>
+										<tr>
+											<td>
+												<span>nome</span>
+											</td>
+											<td>
+												<input name="nomeAziendaInput" type="text" ng-model="aziendaSelezionata.nomeAzienda">
+											</td>
+										</tr>
+										<tr>
+											<td>
+												<span>Luogo</span>
+											</td>
+											<td>
+												<input name="cittaAziendaInput" type="text" ng-model="aziendaSelezionata.cittaAzienda" />
+											</td>
+										</tr>
+										<tr>
+											<td>
+												<span>indirizzo</span>
+											</td>
+											<td>
+												<input type="text" ng-model="aziendaSelezionata.indirizzoAzienda" />
+											</td>
+										</tr>
+										<tr>
+											<td>
+												<span>Info Azienda</span>
+											</td>
+											<td>
+												<input type="checkbox" ng-model="editor"/>
+												<textarea ng-if="editor" ui-tinymce="tinymceOptions" ng-model="aziendaSelezionata.infoAzienda"></textarea>
+												<textarea ng-if="!editor" cols="50" ng-model="aziendaSelezionata.infoAzienda" /></textarea>
+											</td>
+										</tr>
+										<tr>
+											<td>
+												<span>Regione</span>
+											</td>
+											<td>
+												<input type="text" ng-model="aziendaSelezionata.regioneAzienda"/>
+											</td>
+										</tr>
+										<tr>
+											<td>
+												<span>latitudine</span>
+											</td>
+											<td>
+												<input type="text" ng-model="aziendaSelezionata.latitudineAzienda"/>
+											</td>
+										</tr>
+										<tr>
+											<td>
+												<span>longitudine</span>
+											</td>
+											<td>
+												<input type="text" ng-model="aziendaSelezionata.longitudineAzienda"/>
+											</td>
+										</tr>
+										<tr>
+											<td>
+												<span>Sito web</span>
+											</td>
+											<td>
+												<input type="text" ng-model="aziendaSelezionata.sitoAzienda"/>
+											</td>
+										</tr>
+										<tr>
+											<td>
+												<span>Email</span>
+											</td>
+											<td>
+												<input type="text" ng-model="aziendaSelezionata.emailAzienda"/>
+											</td>
+										</tr>
+										<tr>
+											<td>
+												<span>Email secondaria</span>
+											</td>
+											<td>
+												<input type="text" ng-model="aziendaSelezionata.emailSecondariaAzienda"/>
+											</td>
+										</tr>
+										<tr>
+											<td>
+												<span>telefono</span>
+											</td>
+											<td>
+												<input type="text" ng-model="aziendaSelezionata.telefonoAzienda"/>
+											</td>
+										</tr>
+										<tr>
+											<td>
+												<span>url Immagine Azienda</span>
+											</td>
+											<td>
+												<input type="text" ng-model="aziendaSelezionata.urlImmagineAzienda"/>
+											</td>
+										</tr>
+										<tr>
+											<td>
+												<span>Upload Image</span>
+											</td>
+											<td>
+												<input type="file" class="button" ngf-select ng-model="file" name="file" ngf-pattern="'image/*'"
+												    ngf-accept="'image/*'" />
+												<input type="button" value="carica" ng-click="submitImage(file)">
+												<img ng-src="{{aziendaSelezionata.urlImmagineAzienda}}" width="150px" ng-show="aziendaSelezionata.urlImmagineAzienda">
+											</td>
+										</tr>
+										<tr>
+											<td>
+												<span>url Logo Azienda</span>
+											</td>
+											<td>
+												<input type="text" ng-model="aziendaSelezionata.urlLogoAzienda"/>
+											</td>
+										</tr>
+										<tr>
+											<td>
+												<span>Upload Image</span>
+											</td>
+											<td>
+												<input type="file" class="button" ngf-select ng-model="file" name="file" ngf-pattern="'image/*'"
+												    ngf-accept="'image/*'" />
+												<input type="button" value="carica" ng-click="submitImageLogo(file)">
+												<img ng-src="{{aziendaSelezionata.urlLogoAzienda}}" width="150px" ng-show="aziendaSelezionata.urlLogoAzienda">
+											</td>
+										</tr>
+										<tr>
+											<td>
+												<div class="header-block">
+						                            <h3 class="title">Elenco dei vini associati</h3>
+						                        </div>
+											</td>
+											<td>
+												<input type="button" id="apriAggiungiVini" value="Aggiungi Vino" ng-click="apriConfiguratoreVino()" ng-if="idAzienda && !visualizzaEditorVino"/>
+												<input type="button" id="apriAggiungiVini" value="Chiudi Aggiungi Vino" ng-click="apriConfiguratoreVino()" ng-if="idAzienda && visualizzaEditorVino"/>
+											</td>
+										</tr>
+										<tr ng-if="visualizzaEditorVino"><!-- questa row contiene il form per aggiungere un nuovo vino; la visualizzo solo se clicco si Aggiungi Vino  -->
+											<td colspan="2">
+												<table>
+													<tr>
+														<td>
+															<span>Nome Vino</span>
+														</td>
+														<td>
+															<input type="text" ng-model="vinoSelezionato.nomeVino"/>
+														</td>
+													</tr>
+													<tr>
+														<td>
+															<span>Azienda</span>
+														</td>
+														<td>
+															<input type="text" ng-model="vinoSelezionato.aziendaVino.nomeAzienda" disabled="disabled"/>
+														</td>
+													</tr>
+													<tr>
+														<td>
+															<span>Anno</span>
+														</td>
+														<td>
+															<input type="number" ng-model="vinoSelezionato.annoVino"/>
+														</td>
+													</tr>
+													<tr>
+														<td>
+															<span>Uvaggio</span>
+														</td>
+														<td>
+															<input type="text" ng-model="vinoSelezionato.uvaggioVino"/>
+														</td>
+													</tr>
+													<tr>
+														<td>
+															<span>Regione</span>
+														</td>
+														<td>
+															<input type="text" ng-model="vinoSelezionato.regioneVino"/>
+														</td>
+													</tr>
+													<tr>
+														<td>
+															<span>Descrizione Breve</span>
+														</td>
+														<td>
+															<input type="text" ng-model="vinoSelezionato.inBreveVino"/>
+														</td>
+													</tr>
+													<tr>
+														<td>
+															<span>Descrizione</span>
+														</td>
+														<td>
+															<input type="text" ng-model="vinoSelezionato.descrizioneVino"/>
+														</td>
+													</tr>
+													<tr>
+														<td>
+															<span>Info Vino</span>
+														</td>
+														<td>
+															<input type="text" ng-model="vinoSelezionato.infoVino"/>
+														</td>
+													</tr>
+													<tr>
+														<td>
+															<span>urlImmagineVino</span>
+														</td>
+														<td>
+															<input type="text" ng-model="vinoSelezionato.urlImmagineVino"/>
+														</td>
+													</tr>
+													<tr>
+														<td>
+															<span>Upload Immagine Vino</span>
+														</td>
+														<td>
+															<input type="file" class="button" ngf-select ng-model="fileVino" name="fileVino" ngf-pattern="'image/*'"
+															    ngf-accept="'image/*'" ngf-max-size="1MB" ngf-min-height="100"/>
+			<!-- 												    ngf-resize="{width: 200, height: 200}"/> -->
+															<input type="button" value="carica" ng-click="submitImageVino(fileVino)">
+														</td>
+													</tr>
+													<tr>
+														<td>
+															<span>urlLogoVino</span>
+														</td>
+														<td>
+															<input type="text" ng-model="vinoSelezionato.urlLogoVino"/>
+														</td>
+													</tr>
+													<tr>
+														<td>
+															<span>Upload Immagine Vino</span>
+														</td>
+														<td>
+															<input type="file" class="button" ngf-select ng-model="fileLogoVino" name="fileLogoVino" ngf-pattern="'image/*'"
+															    ngf-accept="'image/*'" ngf-max-size="1MB" ngf-min-height="100"/>
+			<!-- 												    ngf-resize="{width: 200, height: 200}"/> -->
+															<input type="button" value="carica" ng-click="submitImageLogoVino(fileLogoVino)">
+														</td>
+													</tr>
+													<tr>
+														<td>
+															<!-- SALVO IL VNO APPENA INSERITO -->
+															<input type="button" value="SALVA VINO" ng-click="salvaVino()">
+														</td>
+													</tr>
+												</table>
+											</td>
+										</tr>
+										<tr>
+											<td colspan="2">
+												<div class="table-responsive">
+						                            <table class="table table-striped table-bordered table-hover">
+					<!-- 	                            rendere dinamica la lista -->
+						                                <thead>
+						                                    <tr>
+						                                        <th>Nome Vino</th>
+						                                        <th>Anno Vino</th>
+						                                        <th></th>
+						                                    </tr>
+						                                </thead>
+						                                <tbody>
+						                                    <tr ng-repeat="vino in viniAzienda | orderBy:'nomeVino'" ng-click="clickVino(vino)">
+						                                        <td>{{vino.nomeVino}}</td>
+						                                        <td>{{vino.annoVino}}</td>
+						                                    </tr>
+						                                </tbody>
+						                            </table>
+						                        </div>
+											</td>
+										</tr>
+										<tr>
+											<td style="padding-top:1em" colspan="2" >
+												<input style="float:left" type="submit" id="submit" value="Salva"/>
+												<input style="float:right" type="button" value="duplica azienda" ng-click="duplicaAzienda()"/>
+											</td>
+										</tr>
+									</table>
+								</form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</article>
